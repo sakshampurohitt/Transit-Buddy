@@ -1,4 +1,4 @@
-
+#include <bits/stdc++.h>
 #include <iostream>
 #include <limits.h>
 #include <string>
@@ -8,8 +8,11 @@
 #include <fstream>
 #include <time.h>
 #include <queue>
+#include <windows.h>
+
 
 using namespace std;
+
 
 // FORWARD DECLARATION
 // Global queue to store user complaints
@@ -18,16 +21,19 @@ const int HASH_SIZE = 200; // Size of HASH TABLE
 ifstream userFileIn;
 ofstream userFileOut;
 
+
 struct station_code;
 struct node1;
 class MetroCard;
 class MetroCardHashTable;
+
 
 struct AdminCredentials
 {
     string username;
     string password;
 };
+
 
 struct station_code
 {
@@ -36,14 +42,17 @@ struct station_code
     string color;
 };
 
+
 struct station_code station[V];
 float graph[V][V];
 struct AdminCredentials adminCredentials = {"admin", "admin123"};
+
 
 struct node1
 {
     vector<float> p;
 } P[V];
+
 
 class MetroCard
 {
@@ -59,9 +68,11 @@ public:
         // Assign a unique card number
     }
 
+
     void WriteToFile() const {
         userFileOut << cardNo << " " << name << " " << phoneNo << " " << balance << endl;
     }
+
 
     static MetroCard* ReadFromFile() {
         int cardNo;
@@ -69,14 +80,18 @@ public:
         int phoneNo;
         float balance;
 
+
         if (userFileIn >> cardNo >> name >> phoneNo >> balance) {
             MetroCard* newUser = new MetroCard(name, balance, phoneNo);
             newUser->cardNo = cardNo;
             return newUser;
         }
 
+
         return nullptr;
     }
+
+
 
 
     void DisplayCard() const
@@ -87,10 +102,12 @@ public:
         cout << "Balance      : " << balance << endl;
     }
 
+
     int GetCardNo() const
     {
         return cardNo;
     }
+
 
     void AddBalance(float amount)
     {
@@ -106,7 +123,9 @@ public:
     }
 };
 
+
 int MetroCard::cardCounter = 246800;
+
 
 class MetroCardHashTable
 {
@@ -120,26 +139,31 @@ public:
         }
     }
 
+
     int getKey(MetroCard *card) const
     {
         int key = card->GetCardNo();
         return key;
     }
 
+
     int firstHash(int key) const
     {
         return key % HASH_SIZE;
     }
+
 
     int secondaryHash(int key) const
     {
         return (25 * key + 17) % HASH_SIZE;
     }
 
+
     int doubleHash(int key, int attempt) const
     {
         return (firstHash(key) + attempt * secondaryHash(key)) % HASH_SIZE;
     }
+
 
     int insert(MetroCard *newCard)
     {
@@ -162,6 +186,7 @@ public:
         }
         return -1;
     }
+
 
     MetroCard *search(int key) const
     {
@@ -190,6 +215,7 @@ public:
         return nullptr;
     }
 
+
     // void display() const
     // {
     //     for (int i = 0; i < HASH_SIZE; i++)
@@ -202,8 +228,10 @@ public:
     // }
 };
 
+
 // Global object declaration
 MetroCardHashTable *hashtable = new MetroCardHashTable();
+
 
 // FORWARD DECLARATION OF FUNCTIONS
 bool AdminLogin();
@@ -225,6 +253,7 @@ MetroCard *NewUserRegister();
 void AdminDisplayAllUsers();
 void ResolveComplaint();
 
+
 // Function to input admin login credentials
 bool AdminLogin()
 {
@@ -232,11 +261,14 @@ bool AdminLogin()
     cout << "Enter Admin Username: ";
     cin >> enteredUsername;
 
+
     cout << "Enter Admin Password: ";
     cin >> enteredPassword;
 
+
     return (enteredUsername == adminCredentials.username && enteredPassword == adminCredentials.password);
 }
+
 
 // Function to convert user input to capital because of file data
 string convertToCapital(string str)
@@ -248,6 +280,7 @@ string convertToCapital(string str)
     }
     return str;
 }
+
 
 // Function to display user information
 void DisplayUserInfo(MetroCard *user)
@@ -262,12 +295,14 @@ void DisplayUserInfo(MetroCard *user)
     cout << "----------------------------------------------------------------------" << endl;
 }
 
+
 // Function to display information for all registered users to admin
 void AdminDisplayAllUsers()
 {
     cout << "----------------------------------------------------------------------" << endl;
     cout << "||                          ALL REGISTERED USERS                     ||" << endl;
     cout << "----------------------------------------------------------------------" << endl;
+
 
     for (int i = 0; i < HASH_SIZE; i++)
     {
@@ -278,8 +313,10 @@ void AdminDisplayAllUsers()
         }
     }
 
+
     cout << "----------------------------------------------------------------------" << endl;
 }
+
 
 // Function to update user information
 void UpdateUserInfo(MetroCard *user)
@@ -295,6 +332,7 @@ void UpdateUserInfo(MetroCard *user)
     cout << "----------------------------------------------------------------------" << endl;
 }
 
+
 // Function to check card balance
 void CheckCardBalance(MetroCard *user)
 {
@@ -305,6 +343,7 @@ void CheckCardBalance(MetroCard *user)
     cout << "Balance     : " << user->balance << endl;
     cout << "----------------------------------------------------------------------" << endl;
 }
+
 
 // Function to add balance to the metro card
 void AddCardBalance(MetroCard *user)
@@ -319,6 +358,7 @@ void AddCardBalance(MetroCard *user)
     cout << "----------------------------------------------------------------------" << endl;
 }
 
+
 // Function to register a complaint
 void RegisterComplaint(MetroCard *user)
 {
@@ -327,12 +367,16 @@ void RegisterComplaint(MetroCard *user)
     cin.ignore(); // Clear the input buffer
     getline(cin, complaint);
 
+
     string complaintDetails = "Card Number: " + to_string(user->GetCardNo()) + "\nName: " + user->name + "\nComplaint: " + complaint;
+
 
     SaveComplaintsToFile(complaintDetails);
 
+
     cout << "Complaint registered successfully!" << endl << endl;
 }
+
 
 // Function to save complaints to a text file
 void SaveComplaintsToFile(string str)
@@ -349,11 +393,13 @@ void SaveComplaintsToFile(string str)
     }
 }
 
+
 // Function to view complaints of users
 void ViewComplaints()
 {
     ifstream inFile("complaints.txt");
     string complaint;
+
 
     if (!inFile.is_open())
     {
@@ -361,7 +407,9 @@ void ViewComplaints()
         return;
     }
 
+
     queue<string> complaintsQueue;
+
 
     // Read complaints from the file and enqueue them
     while (getline(inFile, complaint))
@@ -369,13 +417,16 @@ void ViewComplaints()
         complaintsQueue.push(complaint);
     }
 
+
     inFile.close();
+
 
     if (complaintsQueue.empty())
     {
         cout << "No complaints to view." << endl;
         return;
     }
+
 
     // Display complaints to the admin
     cout << "List of User Complaints:\n\n";
@@ -385,6 +436,7 @@ void ViewComplaints()
         complaintsQueue.pop();
     }
 }
+
 
 // Function to log out
 void Logout()
@@ -400,6 +452,7 @@ int minDistance(float dist[], bool sptSet[])
     float min = INT_MAX;
     int min_index = -1;
 
+
     for (int v = 0; v < V; v++)
     {
         if (!sptSet[v] && dist[v] <= min)
@@ -409,6 +462,7 @@ int minDistance(float dist[], bool sptSet[])
         }
     }
 
+
     return min_index;
 }
 void dijkstra(float graph[V][V], int src, int targ)
@@ -416,18 +470,22 @@ void dijkstra(float graph[V][V], int src, int targ)
     float dist[V];
     bool sptSet[V];
 
+
     for (int i = 0; i < V; i++)
     {
         dist[i] = INT_MAX;
         sptSet[i] = false;
     }
 
+
     dist[src] = 0;
+
 
     for (int count = 0; count < V - 1; count++)
     {
         int u = minDistance(dist, sptSet);
         sptSet[u] = true;
+
 
         for (int v = 0; v < V; v++)
         {
@@ -439,8 +497,10 @@ void dijkstra(float graph[V][V], int src, int targ)
         }
     }
 
+
     printSolution(dist, V, src, targ);
 }
+
 
 void printPath(int parent[], int j)
 {
@@ -448,14 +508,18 @@ void printPath(int parent[], int j)
     if (j == -1)
         return;
 
+
     printPath(parent, parent[j]);
+
 
     cout << station[j + 1].name << "=> ";
 }
 
+
 void printSolution(float dist[], int n, int src, int targ)
 {
     int parent[V];
+
 
     // Extract the path for the target station
     int i = targ;
@@ -466,6 +530,7 @@ void printSolution(float dist[], int n, int src, int targ)
         i = P[i].p[0];
         pathTarg.push_back(i);
     }
+
 
     // Print the paths
     cout << "Shortest path to Target Station  " << endl << endl;
@@ -478,8 +543,10 @@ void printSolution(float dist[], int n, int src, int targ)
     }
     cout << "\n";
 
+
     cout << "\n";
 }
+
 
 // Function to resolve a complaint
 void ResolveComplaint()
@@ -487,11 +554,13 @@ void ResolveComplaint()
     ifstream inFile("complaints.txt");
     string complaint;
 
+
     if (!inFile.is_open())
     {
         cout << "No complaints to resolve." << endl;
         return;
     }
+
 
     // Read complaints from the file and enqueue them
     queue<string> complaintsQueue;
@@ -500,13 +569,16 @@ void ResolveComplaint()
         complaintsQueue.push(complaint);
     }
 
+
     inFile.close();
+
 
     if (complaintsQueue.empty())
     {
         cout << "No complaints to resolve." << endl;
         return;
     }
+
 
     // Display and resolve the first complaint
     cout << "Resolved Complaint:\n";
@@ -519,6 +591,7 @@ void ResolveComplaint()
     cout << complaintsQueue.front() << endl;
     complaintsQueue.pop();
 
+
     // Update the file with the remaining complaints
     ofstream outFile("complaints.txt");
     while (!complaintsQueue.empty())
@@ -527,9 +600,11 @@ void ResolveComplaint()
         complaintsQueue.pop();
     }
 
+
     outFile.close();
     cout << "Complaint resolved and updated in the file." << endl;
 }
+
 
 // Function to register new user to
 MetroCard *NewUserRegister()
@@ -538,15 +613,19 @@ MetroCard *NewUserRegister()
     int phoneNo;
     float balance;
 
+
     // Get user input
     cout << "Enter your name: ";
     cin >> name;
 
+
     cout << "Enter your phone number: ";
     cin >> phoneNo;
 
+
     cout << "Enter initial balance: ";
     cin >> balance;
+
 
     // Create a new MetroCard object
     MetroCard *newCard = new MetroCard(name, balance, phoneNo);
@@ -572,6 +651,7 @@ MetroCard *NewUserRegister()
     }
 }
 
+
 int main()
 {
     vector<MetroCard*> metroCards;
@@ -579,17 +659,20 @@ int main()
     float dis;
     ifstream fin;
 
+
     // Open file for reading user data
     userFileIn.open("user_data.txt");
 
+
     // Open file for writing user data
     userFileOut.open("user_data.txt", ios::app);
-    
+   
     // Inserting user file data to hashtable
     MetroCard* existingUser;
     while ((existingUser = MetroCard::ReadFromFile()) != nullptr) {
         hashtable->insert(existingUser);
     }
+
 
     fin.open("node_values_new.txt");
     // while (fin) {
@@ -668,7 +751,9 @@ int main()
             if (!NewUserRegister())
                 break;
 
+
             // Add user login
+
 
             break;
         case 2:
@@ -678,9 +763,11 @@ int main()
             cout << "Enter your Metro Card Number:";
             cin >> userCard;
 
+
             // Search for the card in the hash table
             MetroCard *user2;
             user2 = hashtable->search(userCard);
+
 
             if (user2 == nullptr)
             {
@@ -780,6 +867,7 @@ int main()
                     cout << "**********************************************************************" << endl;
                     cout << "----------------------------------------------------------------------" << endl;
 
+
                     int choice3;
                     cout << endl
                          << "Enter your choice: ";
@@ -798,9 +886,11 @@ int main()
                         cout << "Enter the customers Metro Card Number:";
                         cin >> userCard;
 
+
                         // Search for the card in the hash table
                         MetroCard *user;
                         user = hashtable->search(userCard);
+
 
                         if (user == nullptr)
                         {
@@ -821,6 +911,7 @@ int main()
                         adminLogout = 1;
                         break;
 
+
                     default:
                         cout << "Invalid choice. Please enter a valid option." << endl;
                     }
@@ -832,23 +923,29 @@ int main()
             }
             break;
 
+
         case 4:
             cout << "You selected ROUTE PLANNER." << endl;
+
 
             cout << "Enter source station name: ";
             cin.ignore(); // Ignore newline character in the input buffer
             getline(cin, start);
 
+
             cout << "Enter target station name: ";
             getline(cin, finish);
 
+
             start = convertToCapital(start);
             finish = convertToCapital(finish);
+
 
             int source;
             source = -1;
             int target;
             target = -1;
+
 
             // Find station codes for source and target
             for (int i = 0; i < V; i++)
@@ -863,6 +960,7 @@ int main()
                 }
             }
 
+
             // Check if the station names are valid
             if (source == -1 || target == -1)
             {
@@ -870,9 +968,11 @@ int main()
                 break;
             }
 
+
             // Call Dijkstra's algorithm with the provided stations
             dijkstra(graph, source, target);
             break;
+
 
         case 5:
             // Code to end the application
@@ -886,6 +986,7 @@ int main()
     }
     userFileIn.close();
     userFileOut.close();
+
 
     return 0;
 }
